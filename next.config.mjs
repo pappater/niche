@@ -1,8 +1,8 @@
+// next.config.mjs
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "export",
-  basePath: "/niche",
-  reactStrictMode: true,
+  // other configurations
 };
 
-module.exports = nextConfig;
+export default nextConfig;
