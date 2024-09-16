@@ -71,13 +71,11 @@ export default function Home() {
   }, [handleObserver]);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-neutral-900 transition-colors duration-200">
+    <div className="min-h-screen bg-white  transition-colors duration-200">
       <div className="container mx-auto p-2 lg:px-[7em] py-7">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-            Niche //
-          </h1>
-          <ThemeToggle />
+          <h1 className="text-3xl font-bold text-gray-900 ">Niche //</h1>
+          {/* <ThemeToggle /> */}
         </div>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <QuoteGrid quotes={quotes} />
