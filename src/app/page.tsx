@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Quote } from "@/types";
 import QuoteGrid from "@/components/quote-grid";
-import ThemeToggle from "@/components/theme-toggle";
 
 export default function Home() {
   const [quotes, setQuotes] = useState<Quote[]>([]);
