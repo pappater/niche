@@ -1,16 +1,16 @@
-// pages/api/quotes/index.js
+// src/app/api/quotes/route.ts
+import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
-import { NextResponse } from "next/server";
+import { Quote } from "@/types";
 
 // Initialize a cache for quotes
-let cachedQuotes: string | any[] | null = null;
+let cachedQuotes: Quote[][] | null = null;
 
-export async function GET(request: { url: string | URL }) {
+export async function GET(request: NextRequest) {
   try {
-    // Read the page number from the query params
     const url = new URL(request.url);
-    const page = parseInt(url.searchParams.get("page") || "1");
+    const page = parseInt(url.searchParams.get("page") || "1", 10);
 
     // Load quotes from the file if not cached
     if (!cachedQuotes) {
