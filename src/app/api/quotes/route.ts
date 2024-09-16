@@ -1,24 +1,36 @@
-import { NextRequest, NextResponse } from "next/server";
+// pages/api/quotes/index.js
 import fs from "fs/promises";
 import path from "path";
-import { Quote } from "@/types";
-let cachedQuotes: Quote[][] | null = null;
+import { NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
+// Initialize a cache for quotes
+let cachedQuotes: string | any[] | null = null;
+
+export async function GET(request: { url: string | URL }) {
   try {
-    const page = parseInt(request.nextUrl.searchParams.get("page") || "1");
+    // Read the page number from the query params
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get("page") || "1");
 
-    // If cachedQuotes is null, load it from the file
+    // Load quotes from the file if not cached
     if (!cachedQuotes) {
       const filePath = path.join(process.cwd(), "public", "quotes.json");
       const fileContents = await fs.readFile(filePath, "utf8");
       cachedQuotes = JSON.parse(fileContents);
     }
 
-    // Assert that cachedQuotes is not null
-    const quotes = cachedQuotes![page - 1]; // The "!" ensures TypeScript that cachedQuotes is non-null
+    // Ensure quotes exist for the requested page
+    if (page < 1 || page > cachedQuotes!.length) {
+      return NextResponse.json(
+        { error: "Page out of bounds" },
+        { status: 400 }
+      );
+    }
 
-    return NextResponse.json({ quotes, hasMore: page < cachedQuotes!.length });
+    const quotes = cachedQuotes![page - 1];
+    const hasMore = page < cachedQuotes!.length;
+
+    return NextResponse.json({ quotes, hasMore });
   } catch (error) {
     console.error("Error in quotes API:", error);
     return NextResponse.json(
