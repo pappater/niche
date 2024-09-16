@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  output: "export",
+  basePath: "/niche",
+  reactStrictMode: true,
+};
 
-export default nextConfig;
+module.exports = nextConfig;

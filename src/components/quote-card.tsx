@@ -1,5 +1,4 @@
 import { Quote } from "@/types";
-import Link from "next/link";
 
 interface QuoteCardProps {
   quote: Quote;
