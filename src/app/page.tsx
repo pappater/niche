@@ -29,7 +29,9 @@ export default function Home() {
         setQuotes((prevQuotes) => {
           // Remove duplicates based on quote text
           const existingQuotes = new Set(prevQuotes.map((q) => q.quote));
-          const newUniqueQuotes = data.quotes.filter((q: Quote) => !existingQuotes.has(q.quote));
+          const newUniqueQuotes = data.quotes.filter(
+            (q: Quote) => !existingQuotes.has(q.quote)
+          );
           return [...prevQuotes, ...newUniqueQuotes];
         });
         setHasMore(data.hasMore);
