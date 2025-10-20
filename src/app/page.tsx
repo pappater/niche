@@ -1,6 +1,5 @@
 "use client";
 
-
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Quote } from "@/types";
 import QuoteGrid from "@/components/quote-grid";
@@ -16,7 +15,6 @@ export default function Home() {
 
   // Ref for the observer element at the bottom
   const loaderRef = useRef<HTMLDivElement | null>(null);
-
 
   // Shuffle array utility
   function shuffleArray<T>(array: T[]): T[] {
@@ -67,7 +65,9 @@ export default function Home() {
       setQuotes((prevQuotes) => {
         // Remove duplicates based on quote text
         const existingQuotes = new Set(prevQuotes.map((q) => q.quote));
-        const newUniqueQuotes = nextQuotes.filter((q) => !existingQuotes.has(q.quote));
+        const newUniqueQuotes = nextQuotes.filter(
+          (q) => !existingQuotes.has(q.quote)
+        );
         return [...prevQuotes, ...newUniqueQuotes];
       });
       setHasMore(endIndex < allQuotes.length);
@@ -76,12 +76,16 @@ export default function Home() {
     }, 400); // Simulate loading delay for smooth UX
   }, [loading, hasMore, page, allQuotes]);
 
-
   // Callback function to handle intersection with the loader element
   const handleObserver = useCallback(
     (entries: IntersectionObserverEntry[]) => {
       const target = entries[0];
-      if (target.isIntersecting && hasMore && !loading && allQuotes.length > 0) {
+      if (
+        target.isIntersecting &&
+        hasMore &&
+        !loading &&
+        allQuotes.length > 0
+      ) {
         fetchQuotes();
       }
     },
