@@ -26,7 +26,12 @@ export default function Home() {
       const data = await res.json();
       console.log("Fetched data:", data);
       if (Array.isArray(data.quotes)) {
-        setQuotes((prevQuotes) => [...prevQuotes, ...data.quotes]);
+        setQuotes((prevQuotes) => {
+          // Remove duplicates based on quote text
+          const existingQuotes = new Set(prevQuotes.map((q) => q.quote));
+          const newUniqueQuotes = data.quotes.filter((q: Quote) => !existingQuotes.has(q.quote));
+          return [...prevQuotes, ...newUniqueQuotes];
+        });
         setHasMore(data.hasMore);
         setPage((prevPage) => prevPage + 1);
       } else {
@@ -78,7 +83,11 @@ export default function Home() {
         </div>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <QuoteGrid quotes={quotes} />
-        {loading && <p className="text-center mt-4">Loading more...</p>}
+        {loading && (
+          <div className="flex justify-center mt-4">
+            <span className="inline-block w-6 h-6 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin" />
+          </div>
+        )}
 
         {/* Loader element at the bottom for intersection observer */}
         <div ref={loaderRef} className="h-1" />

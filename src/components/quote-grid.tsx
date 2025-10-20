@@ -22,7 +22,9 @@ export default function QuoteGrid({ quotes }: QuoteGridProps) {
   return (
     <div className="masonry">
       {uniqueQuotes.map((quote, index) => (
-        <QuoteCard key={index} quote={quote} />
+        <div key={index} className="animate-fade-in">
+          <QuoteCard quote={quote} />
+        </div>
       ))}
     </div>
   );
