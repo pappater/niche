@@ -32,7 +32,9 @@ export default function Home() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch("/quotes.json");
+        // Use basePath for GitHub Pages compatibility
+        const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+        const res = await fetch(`${basePath}/quotes.json`);
         if (!res.ok) {
           throw new Error("Failed to load quotes.json");
         }
