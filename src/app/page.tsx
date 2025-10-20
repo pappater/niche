@@ -1,10 +1,13 @@
 "use client";
 
+
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Quote } from "@/types";
 import QuoteGrid from "@/components/quote-grid";
 
 export default function Home() {
+  const QUOTES_PER_PAGE = 10;
+  const [allQuotes, setAllQuotes] = useState<Quote[]>([]);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -14,54 +17,78 @@ export default function Home() {
   // Ref for the observer element at the bottom
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
-  const fetchQuotes = async () => {
+
+  // Shuffle array utility
+  function shuffleArray<T>(array: T[]): T[] {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }
+
+  // Load all quotes from the static JSON file on mount
+  useEffect(() => {
+    const loadQuotes = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch("/quotes.json");
+        if (!res.ok) {
+          throw new Error("Failed to load quotes.json");
+        }
+        const data = await res.json();
+        // Flatten if nested
+        const flatQuotes = Array.isArray(data) ? data.flat() : [];
+        const shuffled = shuffleArray(flatQuotes);
+        setAllQuotes(shuffled);
+        // Set initial page
+        setQuotes(shuffled.slice(0, QUOTES_PER_PAGE));
+        setHasMore(shuffled.length > QUOTES_PER_PAGE);
+        setPage(2);
+      } catch (err) {
+        setError("Failed to load quotes. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadQuotes();
+  }, []);
+
+  // Fetch next page of quotes (client-side)
+  const fetchQuotes = useCallback(() => {
     if (loading || !hasMore) return;
     setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(`/api/quotes?page=${page}`);
-      if (!res.ok) {
-        throw new Error("Failed to fetch quotes");
-      }
-      const data = await res.json();
-      console.log("Fetched data:", data);
-      if (Array.isArray(data.quotes)) {
-        setQuotes((prevQuotes) => {
-          // Remove duplicates based on quote text
-          const existingQuotes = new Set(prevQuotes.map((q) => q.quote));
-          const newUniqueQuotes = data.quotes.filter(
-            (q: Quote) => !existingQuotes.has(q.quote)
-          );
-          return [...prevQuotes, ...newUniqueQuotes];
-        });
-        setHasMore(data.hasMore);
-        setPage((prevPage) => prevPage + 1);
-      } else {
-        console.error("Unexpected data structure:", data);
-        setError("Unexpected data structure received from server");
-      }
-    } catch (err) {
-      console.error("Error fetching quotes:", err);
-      setError("Failed to fetch quotes. Please try again later.");
-    } finally {
+    setTimeout(() => {
+      const startIndex = (page - 1) * QUOTES_PER_PAGE;
+      const endIndex = startIndex + QUOTES_PER_PAGE;
+      const nextQuotes = allQuotes.slice(startIndex, endIndex);
+      setQuotes((prevQuotes) => {
+        // Remove duplicates based on quote text
+        const existingQuotes = new Set(prevQuotes.map((q) => q.quote));
+        const newUniqueQuotes = nextQuotes.filter((q) => !existingQuotes.has(q.quote));
+        return [...prevQuotes, ...newUniqueQuotes];
+      });
+      setHasMore(endIndex < allQuotes.length);
+      setPage((prevPage) => prevPage + 1);
       setLoading(false);
-    }
-  };
+    }, 400); // Simulate loading delay for smooth UX
+  }, [loading, hasMore, page, allQuotes]);
 
-  useEffect(() => {
-    fetchQuotes();
-  }, []);
 
   // Callback function to handle intersection with the loader element
   const handleObserver = useCallback(
     (entries: IntersectionObserverEntry[]) => {
       const target = entries[0];
-      if (target.isIntersecting && hasMore && !loading) {
+      if (target.isIntersecting && hasMore && !loading && allQuotes.length > 0) {
         fetchQuotes();
       }
     },
-    [loading, hasMore]
+    [loading, hasMore, allQuotes, fetchQuotes]
   );
+
+  // Callback function to handle intersection with the loader element
 
   // UseEffect to observe the loader ref
   useEffect(() => {
