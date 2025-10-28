@@ -1,0 +1,46 @@
+name: Sync quotes.json to Gist
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'public/quotes.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync-to-gist:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update Gist
+        env:
+          GIST_ID: e8e11e652b31f1d3196277d7d05a9819
+          GITHUB_TOKEN: ${{ secrets.GIST_TOKEN }}
+        run: |
+          # Read the quotes.json file
+          CONTENT=$(cat public/quotes.json)
+          
+          # Create JSON payload for the gist update
+          # The gist file name should match what's expected
+          PAYLOAD=$(jq -n \
+            --arg content "$CONTENT" \
+            '{
+              files: {
+                "quotes.json": {
+                  content: $content
+                }
+              }
+            }')
+          
+          # Update the gist using GitHub API
+          curl -X PATCH \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/gists/$GIST_ID" \
+            -d "$PAYLOAD"
