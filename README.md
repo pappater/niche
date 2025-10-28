@@ -69,8 +69,10 @@ To enable gist synchronization, you need to create a GitHub Personal Access Toke
 5. Generate the token and copy it
 6. Go to your repository's Settings > Secrets and variables > Actions
 7. Create a new repository secret named `GIST_TOKEN` and paste your token
+8. (Optional) If you want to use a different gist, update the `GIST_ID` in `.github/workflows/sync-gist.yml`
 
-The workflow will automatically update the gist at `https://gist.github.com/pappater/e8e11e652b31f1d3196277d7d05a9819` whenever `public/quotes.json` is modified.
+The workflow will automatically update the configured gist (currently: `https://gist.github.com/pappater/e8e11e652b31f1d3196277d7d05a9819`) whenever `public/quotes.json` is modified.
+
 
 
 ## Customization
