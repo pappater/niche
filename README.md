@@ -18,6 +18,7 @@ Niche is a web application built with Next.js 14 and TypeScript. It displays a c
 - `public/quotes.json` — Static data source for quotes
 - `tailwind.config.ts` — Tailwind CSS configuration
 - `.github/workflows/deploy.yml` — GitHub Actions workflow for deployment
+- `.github/workflows/sync-gist.yml` — GitHub Actions workflow for syncing quotes.json to gist
 
 ## Local Development
 
@@ -49,6 +50,28 @@ This project is configured to deploy automatically to GitHub Pages using GitHub 
 - The app uses `npm run export` to generate a static site. Ensure all routes and assets are compatible with static export.
 - The base path is set dynamically for GitHub Pages deployment.
 - The published site will be available at `https://<your-username>.github.io/<repository-name>/`.
+
+## Gist Synchronization
+
+This project includes an automated workflow to synchronize `public/quotes.json` to a GitHub Gist. The workflow is triggered automatically when:
+
+- Changes are pushed to the `main` branch that modify `public/quotes.json`
+- The workflow is manually triggered via the GitHub Actions interface
+
+### Setup Instructions
+
+To enable gist synchronization, you need to create a GitHub Personal Access Token with gist permissions:
+
+1. Go to [GitHub Settings > Developer settings > Personal access tokens > Tokens (classic)](https://github.com/settings/tokens)
+2. Click "Generate new token (classic)"
+3. Give it a descriptive name (e.g., "Niche Gist Sync")
+4. Select the `gist` scope
+5. Generate the token and copy it
+6. Go to your repository's Settings > Secrets and variables > Actions
+7. Create a new repository secret named `GIST_TOKEN` and paste your token
+
+The workflow will automatically update the gist at `https://gist.github.com/pappater/e8e11e652b31f1d3196277d7d05a9819` whenever `public/quotes.json` is modified.
+
 
 ## Customization
 
